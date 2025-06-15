@@ -13,6 +13,7 @@ Tensor = torch.cuda.FloatTensor if cuda else torch.Tensor
 encoder = Encoder(dim=32, in_channels=1, n_downsample=2)
 G_trg= Generator(dim=32, out_channels=1, n_upsample=2, shared_block=ResidualBlock(features=shared_dim))
 
+# load path
 encoder.load_state_dict(torch.load(".\\models\\encoder_99.pth", map_location=torch.device('cpu')))
 G_trg.load_state_dict(torch.load(".\\models\\G2_99.pth", map_location=torch.device('cpu')))
 
