@@ -13,7 +13,6 @@ import struct
 from params import *
 from scipy.signal import lfilter
 import soundfile as sf
-import matplotlib.pyplot as plt
 from warnings import warn
 import pedalboard
 import random
@@ -266,75 +265,7 @@ def to_numpy(batch):
     batch = np.squeeze(batch)
     return batch
 
-def plot_mel_transfer_train(save_path, curr_epoch, mel_in, mel_cyclic, mel_out, mel_target):
-    """Visualises melspectrogram style transfer in training, with target specified"""
-    fig, ax = plt.subplots(nrows=2, ncols=2, figsize=(6, 6))
     
-    ax[0,0].imshow(mel_in, interpolation="None")
-    ax[0,0].invert_yaxis()
-    ax[0,0].set(title='Input')
-    ax[0,0].set_ylabel('Mels')
-    ax[0,0].axes.xaxis.set_ticks([])
-    ax[0,0].axes.xaxis.set_ticks([])
-    
-    ax[1,0].imshow(mel_cyclic, interpolation="None")
-    ax[1,0].invert_yaxis()
-    ax[1,0].set(title='Cyclic Reconstruction')
-    ax[1,0].set_xlabel('Frames')
-    ax[1,0].set_ylabel('Mels')
-
-    ax[0,1].imshow(mel_out, interpolation="None")
-    ax[0,1].invert_yaxis()
-    ax[0,1].set(title='Output')
-    ax[0,1].axes.yaxis.set_ticks([])
-    ax[0,1].axes.xaxis.set_ticks([])
-    
-    ax[1,1].imshow(mel_target, interpolation="None")
-    ax[1,1].invert_yaxis()
-    ax[1,1].set(title='Target')
-    ax[1,1].set_xlabel('Frames')
-    ax[1,1].axes.yaxis.set_ticks([])
-    
-    fig.suptitle('Epoch ' + str(curr_epoch))
-    plt.savefig(save_path)
-    plt.close()
-    
-def plot_batch_train(modelname, direction, curr_epoch, SRC, cyclic_SRC, fake_TRGT, real_TRGT):
-    SRC, cyclic_SRC, fake_TRGT, real_TRGT = to_numpy(SRC), to_numpy(cyclic_SRC), to_numpy(fake_TRGT), to_numpy(real_TRGT)
-    i = 1
-    for src, cyclic_src, fake_target, real_target in zip(SRC, cyclic_SRC, fake_TRGT, real_TRGT):
-        fname = "out_train/%s/%s/%s_%02d_%s.png"%(modelname, direction, direction, curr_epoch, i)
-        plot_mel_transfer_train(fname, curr_epoch, src, cyclic_src, fake_target, real_target)
-        i += 1
-    
-def plot_mel_transfer_eval(save_path, mel_in, mel_out):
-    """Visualises melspectrogram style transfer in testing, only shows input and output"""
-    fig, ax = plt.subplots(nrows=1, ncols=2, sharex=True, figsize=(10,6))
-    
-    ax[0].imshow(mel_in, interpolation="None")
-    ax[0].invert_yaxis()
-    ax[0].set(title='Input')
-    ax[0].set_ylabel('Mels')
-    ax[0].set_xlabel('Frames')
-
-    ax[1].imshow(mel_out, interpolation="None")
-    ax[1].invert_yaxis()
-    ax[1].set(title='Output')
-    ax[1].set_xlabel('Frames')
-    ax[1].axes.yaxis.set_ticks([])
-
-    plt.tight_layout()
-    plt.savefig(save_path)
-    plt.close()
-   
-    
-def plot_batch_eval(modelname, direction, batchno, SRC, fake_TRGT):
-    SRC, fake_TRGT = to_numpy(SRC), to_numpy(fake_TRGT)
-    i = 1
-    for src, fake_target in zip(SRC, fake_TRGT):
-        fname = "out_eval/%s/%s/%s_%04d_%s.png"%(modelname, direction, direction, batchno, i)
-        plot_mel_transfer_eval(fname, src, fake_target)
-        i += 1
         
         
 def wav_batch_eval(modelname, direction, batchno, SRC, fake_TRGT):
@@ -351,23 +282,3 @@ def wav_batch_eval(modelname, direction, batchno, SRC, fake_TRGT):
         out_fname = name + '_out.wav'
         sf.write(out_fname, out, sample_rate)
         i += 1
-        
-
-def plot_mel_transfer_infer(save_path, mel_in, mel_out):
-    """Visualises melspectrogram style transfer in inference, shows total input and output"""
-    fig, ax = plt.subplots(nrows=2, ncols=1, sharey=True)
-
-    ax[0].imshow(mel_in, interpolation="None", aspect='auto')
-    ax[0].set(title='Input')
-    ax[0].set_ylabel('Mels')
-    ax[0].axes.xaxis.set_ticks([])
-
-    ax[1].imshow(mel_out, interpolation="None", aspect='auto')
-    ax[1].set(title='Output')
-    ax[1].set_ylabel('Mels')
-    ax[1].set_xlabel('Frames')
-    
-    ax[0].invert_yaxis()
-    plt.tight_layout()
-    plt.savefig(save_path)
-    plt.close()
