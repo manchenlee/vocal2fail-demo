@@ -18,8 +18,8 @@ port = int(os.environ.get("PORT", 5000))
 
 app = Flask(
     __name__,
-    template_folder=os.path.join(os.path.dirname(__file__), "../templates"),
-    static_folder=os.path.join(os.path.dirname(__file__), "../static")
+    template_folder=os.path.join(os.path.dirname(__file__), "./templates"),
+    static_folder=os.path.join(os.path.dirname(__file__), "./static")
 )
 
 app.run(host="0.0.0.0", port=port)

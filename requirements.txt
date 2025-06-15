@@ -1,6 +1,5 @@
 Flask
 librosa
-matplotlib
 numpy
 pedalboard
 scipy
