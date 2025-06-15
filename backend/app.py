@@ -62,6 +62,7 @@ def process_audio():
 
 
 if __name__ == "__main__":
+    # start cmd
     ensure_model_exists()
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
