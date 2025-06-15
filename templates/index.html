@@ -1,0 +1,166 @@
+<!-- frontend/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Vocal2Fail</title>
+</head>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="styles.css">
+<body>
+      <h1>Vocal2Fail</h1>
+
+  <!-- 合併音檔輸入與滑桿區塊 -->
+  <div class="area control-area">
+    <div class="inline-area">
+      <button id="recordBtn">
+        <i class="bi bi-record-circle" style='font-size:24px; color:red;'></i>
+      </button>
+      <p id="recordingStatus">錄音</p>
+    </div>
+    <div class="inline-area">
+      <span style="font-weight: bold;">或</span>
+    </div>
+    <div class="inline-area">
+      <input type="file" id="audioInput" accept="audio/*" class="form-control">
+    </div>
+
+    <div class="inline-area range-area">
+      <div id="ppLabel">預設</div>
+      <input type="range" class="form-range" min="0" max="10" step="5" id="level" value="0">
+    </div>
+
+    <div class="inline-area">
+      <button type="button" class="btn btn-dark" id="submit" onclick="submitAudio()">送出</button>
+    </div>
+  </div>
+
+  <!-- 音檔輸出結果區 -->
+  <div class="area audio-area" id="result">
+    <div class="inline-area">
+      <audio id="resultAudio" controls style="display:none"></audio>
+      <a id="downloadLink" class="btn btn-dark" style="display:none;">下載</a>
+    </div>
+  </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>
+  <script>
+    
+    const recordBtn = document.getElementById("recordBtn");
+    const audioFile = document.getElementById("audioInput");
+    const level = document.getElementById("level");
+    const rangeLabel = document.getElementById("ppLabel");
+    const submitBtn = document.getElementById("submit");
+    const resultArea = document.getElementById("result");
+
+    function updateRangeLabel(value) {
+    const numericValue = parseInt(value);
+    let label;
+    if (numericValue == 0) {
+        label = "預設";
+    } else if (numericValue == 5) {
+        label = "糟";
+    } else {
+        label = "更糟";
+    }
+    rangeLabel.textContent = label;
+    }
+
+    // 初始化顯示
+    updateRangeLabel(level.value);
+
+    // 綁定事件
+    level.addEventListener("input", () => {
+    updateRangeLabel(level.value);
+    });
+    
+    
+    let mediaRecorder;
+    let isRecording = false;
+    let audioChunks = [];
+
+    recordBtn.onclick = async () => {
+    if (!isRecording) {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+
+        audioChunks = [];
+        mediaRecorder.ondataavailable = e => {
+            audioChunks.push(e.data);
+        };
+
+        mediaRecorder.onstart = () => {
+            isRecording = true;
+            recordingStatus.textContent = "錄音中...";
+            recordBtn.innerHTML = `<i class="bi bi-stop-fill" style='font-size:24px'></i>`;
+        };
+        mediaRecorder.start();
+    } else {
+            if (mediaRecorder && mediaRecorder.state === "recording") {
+                mediaRecorder.stop();
+            }
+            mediaRecorder.onstop = () => {
+            isRecording = false;
+            recordingStatus.textContent = "錄音完成。";
+            recordBtn.innerHTML = `<i class="bi bi-record-circle" style='font-size:24px; color:red;'></i>`;
+
+            const blob = new Blob(audioChunks, { type: "audio/wav" });
+            const file = new File([blob], "vocal_recorded.wav", { type: "audio/wav" });
+
+            const dt = new DataTransfer();
+            dt.items.add(file);
+            audioFile.files = dt.files;
+            };
+        }    
+    };
+
+    async function submitAudio() {
+      const audio = audioFile.files[0];
+      const lvl = level.value;
+      if (!audio) {
+        alert("請先上傳音檔！");
+        return;
+      }
+      submitBtn.disabled = true;
+      //submitBtn.style.backgroundColor = '#fff';
+      //submitBtn.style.border = 'none';
+      resultArea.innerHTML = `<img src="./img/loading.gif" alt="Loading..." style="height: 64px;">`;
+      const formData = new FormData();
+      formData.append("audio", audio);
+      formData.append("level", lvl);
+
+      const response = await fetch("http://localhost:5000/process", {
+        method: "POST",
+        body: formData
+      });
+
+      if (!response.ok) {
+        alert("轉換失敗！");
+        return;
+      }
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      submitBtn.disabled = false;
+      //submitBtn.style.backgroundColor = '';
+      //submitBtn.style.border = '';
+      resultArea.innerHTML = `<div class="inline-area">
+      <audio id="resultAudio" controls style="display:none"></audio>
+      <a id="downloadLink" class="btn btn-dark" style="display:none;">下載</a>
+    </div>`;
+
+      const audioPlayer = document.getElementById("resultAudio");
+      audioPlayer.src = url;
+      audioPlayer.style.display = "inline-block";
+      const downloadLink = document.getElementById("downloadLink");
+      downloadLink.href = url;
+      downloadLink.download = audio['name'].split('.')[0] + '-failed.wav';
+      downloadLink.textContent = "下載";
+      downloadLink.style.display = "inline";
+    }
+  </script>
+</body>
+<footer>
+    <p>© 2025 manchenlee</p>
+</footer>
+</html>
