@@ -9,6 +9,8 @@ from vocoder import mel2audio
 from scipy.io.wavfile import write
 from env import AttrDict
 import os
+from model_downloader import ensure_model_exists
+ensure_model_exists()
 
 app = Flask(
     __name__,
