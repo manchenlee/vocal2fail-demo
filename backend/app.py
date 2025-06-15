@@ -1,4 +1,7 @@
 # backend/app.py
+from model_downloader import ensure_model_exists
+ensure_model_exists()
+
 from flask import Flask, request, send_file, render_template
 import tempfile
 import torch
@@ -6,12 +9,11 @@ import json
 from io import BytesIO
 from inference import audio_infer
 from vocoder import mel2audio
-from model_downloader import ensure_model_exists
+
 from scipy.io.wavfile import write
 from env import AttrDict
 import os
 
-ensure_model_exists()
 port = int(os.environ.get("PORT", 5000))
 
 app = Flask(
