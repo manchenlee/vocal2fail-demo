@@ -35,7 +35,7 @@ def mel2audio(mel, h):
     generator = Generator(h).to(device)
     #print(device)
     #print(mel.shape, type(mel))
-    state_dict_g = load_checkpoint('./models/g_10020000', device)
+    state_dict_g = load_checkpoint('./backend/models/g_10020000', device)
     generator.load_state_dict(state_dict_g['generator'])
     #print(generator)
     generator.eval()

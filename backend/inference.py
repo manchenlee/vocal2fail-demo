@@ -13,8 +13,8 @@ Tensor = torch.cuda.FloatTensor if cuda else torch.Tensor
 encoder = Encoder(dim=32, in_channels=1, n_downsample=2)
 G_trg= Generator(dim=32, out_channels=1, n_upsample=2, shared_block=ResidualBlock(features=shared_dim))
 
-encoder.load_state_dict(torch.load(".\\models\\encoder_99.pth", map_location=torch.device('cpu')))
-G_trg.load_state_dict(torch.load(".\\models\\G2_99.pth", map_location=torch.device('cpu')))
+encoder.load_state_dict(torch.load("./backend\\models\\encoder_99.pth", map_location=torch.device('cpu')))
+G_trg.load_state_dict(torch.load("./backend\\models\\G2_99.pth", map_location=torch.device('cpu')))
 
 encoder.eval()
 G_trg.eval()
@@ -28,7 +28,7 @@ def infer(S, multi):
     ret = {} # just stores inference output
 
     mu, Z = encoder(X)
-    attr_vector_pp = np.load('.\\models\\attr.npy')
+    attr_vector_pp = np.load('./backend\\models\\attr.npy')
     Z = Z + multi * torch.from_numpy(attr_vector_pp)
         
     fake_X = G_trg(Z)
