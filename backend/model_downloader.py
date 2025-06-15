@@ -9,7 +9,7 @@ def ensure_model_exists():
         print("Downloading and extracting model...")
         gdown.download('https://drive.google.com/uc?id=1xH1p2vZ7EkN1mQGWDDNRw51ThdV29En2', './backend/models.zip', quiet=False)
         with zipfile.ZipFile("./backend/models.zip", 'r') as zip_ref:
-            zip_ref.extractall(".")
+            zip_ref.extractall("./backend/")
         print("Model extracted.")
     else:
         print("Model already exists.")
