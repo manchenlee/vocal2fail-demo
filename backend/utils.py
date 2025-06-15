@@ -371,10 +371,3 @@ def plot_mel_transfer_infer(save_path, mel_in, mel_out):
     plt.tight_layout()
     plt.savefig(save_path)
     plt.close()
-    
-    
-if __name__ == '__main__':
-    for i in range(5):
-        temp = preprocess_wav_augmentation('..\data\self_test\\fuyunohana.wav')
-        sf.write('fuyunohana_{}.wav'.format(i), temp, samplerate=24000)
-    pass

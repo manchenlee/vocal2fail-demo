@@ -6,16 +6,21 @@ import json
 from io import BytesIO
 from inference import audio_infer
 from vocoder import mel2audio
+from model_downloader import ensure_model_exists
 from scipy.io.wavfile import write
 from env import AttrDict
 import os
-from model_downloader import ensure_model_exists
+
+ensure_model_exists()
+port = int(os.environ.get("PORT", 5000))
 
 app = Flask(
     __name__,
     template_folder=os.path.join(os.path.dirname(__file__), "../templates"),
     static_folder=os.path.join(os.path.dirname(__file__), "../static")
 )
+
+app.run(host="0.0.0.0", port=port)
 
 @app.route("/")
 def index():
@@ -61,8 +66,6 @@ def process_audio():
     return send_file(output_io, mimetype="audio/wav", as_attachment=True, download_name="output.wav")
 
 
-if __name__ == "__main__":
-    # start cmd
-    ensure_model_exists()
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+#if __name__ == "__main__":
+    
+    
