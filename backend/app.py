@@ -48,7 +48,7 @@ def process_audio():
     converted = audio_infer(tmp_input_path, int(level))
     print('complete.')
 
-    config_file = 'config.json'
+    config_file = './backend/config.json'
     with open(config_file) as f:
         data = f.read()
 
